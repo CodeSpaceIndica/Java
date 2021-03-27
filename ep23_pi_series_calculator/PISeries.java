@@ -11,7 +11,7 @@ public abstract class PISeries {
     public abstract void calculatePI();
     public abstract String getName();
 
-    protected static final MathContext PRECISION = new MathContext(100);
+    protected static final MathContext PRECISION = new MathContext(104);
 
     protected static final BigDecimal ONE = new BigDecimal(1);
 
