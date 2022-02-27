@@ -1,8 +1,8 @@
 //To Compile : javac -d . *.java
-//To Execute : java codespace.piseries.PIMain
+//To Execute : java codespace.piseries.ramanujam.PIMain
 //Java version when this was created : openjdk version "14.0.1" 2021-03-13
 
-package codespace.piseries;
+package codespace.piseries.ramanujam;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -17,7 +17,10 @@ import javax.swing.JFrame;
 public class PIMain {
 
   public static void main(String args[]) {
-    JFrame mainFrame = new JFrame("PI Series Calculators");
+    //Load the reference files first
+    PILoadRefs.loadFile();
+
+    JFrame mainFrame = new JFrame("Ramanujam PI Calculator");
 
     //When window X button is clcked, it exits the application.
     mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -25,12 +28,12 @@ public class PIMain {
     Dimension screenSize = mainFrame.getToolkit().getScreenSize();
 
     //Set size to 1000, 600
-    mainFrame.setSize(screenSize.width-50, 600);
+    mainFrame.setSize(screenSize.width, screenSize.height);
 
     //Get the resolution of the screen and put Main window in the middle 
     //of the screen.
-    int xLoc = screenSize.width/2 - ((screenSize.width-50)/2);
-    int yLoc = 100;
+    int xLoc = 0;//screenSize.width/2 - ((screenSize.width-50)/2);
+    int yLoc = 0;
     mainFrame.setLocation(xLoc, yLoc);
 
     PICanvas piCanvas = new PICanvas();
@@ -38,7 +41,6 @@ public class PIMain {
 
     //Shows the Window
     mainFrame.setVisible(true);
-
-    piCanvas.startCalculating();
+    mainFrame.setExtendedState(mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
 }
