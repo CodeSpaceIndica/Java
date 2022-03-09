@@ -147,8 +147,12 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
 
                 this.repaint();
             }
+            int typeSpeed = props.typingSpeed;
+            if( this.fileContents[index].equals(" ")) {
+                typeSpeed = 1;
+            }
 
-            try { Thread.sleep(props.typingSpeed); } catch(Exception e){}
+            try { Thread.sleep(typeSpeed); } catch(Exception e){}
         }
     }
 
