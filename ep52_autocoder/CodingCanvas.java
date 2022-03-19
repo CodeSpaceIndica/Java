@@ -91,8 +91,8 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
             Graphics2D g = (Graphics2D)this.getGraphics();
             g.setFont(props.font);
             FontMetrics metrics = g.getFontMetrics();
-            charWidth  = metrics.charWidth('A');
-            charWidth+=2;
+            charWidth = metrics.charWidth('A');
+            charWidth += 2;
             charHeight = (int)props.font.createGlyphVector(metrics.getFontRenderContext(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890").getVisualBounds().getHeight();
             charHeight += 8;
 
@@ -109,6 +109,7 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
             buffG = (Graphics2D)bufferImage.getGraphics();
             buffG.setColor(props.backgroundColor);
             buffG.fillRect(0, 0, this.getSize().width, numLines);
+            buffG.setFont(props.font);
             imageY = 0;
 
             typerThread.start();
@@ -129,9 +130,10 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
     public void paintComponent(Graphics gr) {
         Graphics2D g = (Graphics2D)gr;
 
+        g.setColor(props.backgroundColor);
+        g.fillRect(0, 0, this.getSize().width, this.getSize().height);
+
         if( !isStarted ) {
-            g.setColor(props.backgroundColor);
-            g.fillRect(0, 0, this.getSize().width, this.getSize().height);
             return;
         }
 
@@ -158,7 +160,16 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        startTyping();
+        if( e.getClickCount() == 1 ) {
+            startTyping();
+        }
+        else if( e.getClickCount() == 2 ) {
+            index = 0;
+            currentColor = props.regularColor;
+    
+            x = startX;
+            y = startY;
+        }
     }
     @Override
     public void mousePressed(MouseEvent e) {}
@@ -303,9 +314,7 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
     private void drawOnBufferedImage() {
         buffG.setRenderingHints(rh);
 
-        buffG.setFont(props.font);
-
-        if( this.fileContents[index].equals("\n") ) {
+        if( this.fileContents[index].equals("\n") || this.fileContents[index].equals("\r")  || this.fileContents[index].equals("\r\n") ) {
             player.playEnterSound();
 
             buffG.setColor(props.backgroundColor);
@@ -378,6 +387,22 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
         }
 
         if( index < this.fileContents.length ) {
+            // if( this.fileContents[index].equals("\n") || this.fileContents[index].equals("\r")  || this.fileContents[index].equals("\r\n") ) {
+            //     player.playEnterSound();
+    
+            //     buffG.setColor(props.backgroundColor);
+            //     buffG.fillRect(x, y-(charHeight/2), charWidth, charHeight);
+    
+            //     y += charHeight;
+            //     x = startX;
+            //     //index++;
+    
+            //     if( y > this.getSize().height-200 ) {
+            //         imageY -= charHeight;
+            //     }
+            //     return;
+            // }
+
             buffG.setColor(props.cursorColor);
             buffG.drawString( props.cursorChar, x+charWidth, y);
 
@@ -387,7 +412,9 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
             buffG.setColor(currentColor);
             buffG.drawString( this.fileContents[index], x, y);
 
-            x += charWidth;
+            if( !this.fileContents[index].equals("\n")  ) {
+                x += charWidth;
+            }
             if( index % props.frequency == 0 ) {
                 player.playRandomMechKeySound();
             }
