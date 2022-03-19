@@ -35,6 +35,8 @@ public class CoderProperties {
     public String []otherPropertiesMethods = null;
 
     public Font font = null;
+    public int widthOffset = 2;
+    public int heightOffset = 8;
 
     public Color backgroundColor        = null;
     public Color regularColor           = null;
@@ -74,6 +76,9 @@ public class CoderProperties {
             loadFormatFile();
 
             font = getFontProperty("ac.font.name", "ac.font.size");
+
+            widthOffset = getIntProperty("ac.font.widthoffset");
+            heightOffset = getIntProperty("ac.font.heightoffset");
 
             backgroundColor         = getColorProperty("ac.color.background");
             regularColor            = getColorProperty("ac.color.regular");

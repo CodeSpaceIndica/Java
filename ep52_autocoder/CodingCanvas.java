@@ -92,9 +92,9 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
             g.setFont(props.font);
             FontMetrics metrics = g.getFontMetrics();
             charWidth = metrics.charWidth('A');
-            charWidth += 2;
+            charWidth += props.widthOffset;
             charHeight = (int)props.font.createGlyphVector(metrics.getFontRenderContext(), "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890").getVisualBounds().getHeight();
-            charHeight += 8;
+            charHeight += props.heightOffset;
 
             currentColor = props.regularColor;
     
@@ -387,22 +387,6 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
         }
 
         if( index < this.fileContents.length ) {
-            // if( this.fileContents[index].equals("\n") || this.fileContents[index].equals("\r")  || this.fileContents[index].equals("\r\n") ) {
-            //     player.playEnterSound();
-    
-            //     buffG.setColor(props.backgroundColor);
-            //     buffG.fillRect(x, y-(charHeight/2), charWidth, charHeight);
-    
-            //     y += charHeight;
-            //     x = startX;
-            //     //index++;
-    
-            //     if( y > this.getSize().height-200 ) {
-            //         imageY -= charHeight;
-            //     }
-            //     return;
-            // }
-
             buffG.setColor(props.cursorColor);
             buffG.drawString( props.cursorChar, x+charWidth, y);
 
