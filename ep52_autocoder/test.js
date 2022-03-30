@@ -1,29 +1,39 @@
-function audioVisualize() {
-    analyser.getByteTimeDomainData(dataArray);
+function loadImage() {
+    anImage = new Image();
+    anImage.src = "thebigintlogo.png";õ
+    anImage.onload = function() {
+        let imgW = this.width;
+        let imgH = this.height;
+        let factor = width / imgW;õ
 
-    // clear the previous shape
-    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-    ctx.beginPath();
-    ctx.rect(0, 0, width, height);
-    ctx.fill();
-    let cX = width/2;
-    let cY = height/2;
+        let tempCanvas = document.createElement("canvas");
+        tempCanvas.width = imgW;
+        tempCanvas.height = imgH;
+        let tempCtx = tempCanvas.getContext("2d");
+        tempCtx.drawImage(anImage, 0, 0);
+        let imageData = tempCtx.getImageData(0, 0, imgW, imgH);
+        let pixelData = imageData.data;õ
 
-    let radian = 0;
-    let radianAdd = Constants.TWO_PI * (1.0 / dataArray.length);
-    ctx.fillStyle = "hsl(" + hue + ", 100%, 50%)";
-    for(let i=0; i<dataArray.length; i++) {
-        v = dataArray[i];
+        for(let i=0; i<imgW; i++) {
+            for(let j=0; j<imgH; j++) {
+                let currPix = (i + j * imgW) * 4;õ
 
-        let x = v * Math.cos(radian) + cX;
-        let y = v * Math.sin(radian) + cY;
+                let r = pixelData[currPix+0];
+                let g = pixelData[currPix+1];
+                let b = pixelData[currPix+2];
 
-        ctx.beginPath();
-        ctx.arc(x, y, 2, 0, Constants.TWO_PI, false);
-        ctx.fill();
+                let max = Math.max(r, g, b);õ
 
-        radian += radianAdd;
-    }
+                if( max > THRESHOLD ) {
+                    let x = i * factor;
+                    let y = j * factor;
 
-    requestAnimationFrame(audioVisualize);
+                    let aPoint = new Point(x, y);
+                    points.push( aPoint );õ
+                }
+            }
+        }
+
+        tempCtx.putImageData(imageData, 0, 0);
+    }        
 }

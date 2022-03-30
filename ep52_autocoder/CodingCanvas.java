@@ -385,6 +385,10 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
             currentColor = props.regularColor;
             index++;
         }
+        if( this.fileContents[index].equals("õ") ) {
+            index++;
+            paused = true;
+        }
 
         if( index < this.fileContents.length ) {
             buffG.setColor(props.cursorColor);
