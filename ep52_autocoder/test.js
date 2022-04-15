@@ -1,4 +1,6 @@
 function audioVisualize() {
+    let chr = '235';
+    let something = 'a';
     analyser.getByteTimeDomainData(dataArray);
 
     // clear the previous shape
@@ -8,6 +10,8 @@ function audioVisualize() {
     ctx.fill();
     let cX = width/2;
     let cY = height/2;
+
+    var someNUmber = 24;
 
     let radian = 0;
     let radianAdd = Constants.TWO_PI * (1.0 / dataArray.length);

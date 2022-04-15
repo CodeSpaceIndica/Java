@@ -276,39 +276,60 @@ public class CodingCanvas extends JPanel implements Runnable, MouseListener {
             this.fileContentsStr = this.fileContentsStr.replace(originalCommentString, commentChar+commentString+endStyleChar);
         }
 
-        //Strings. Doesn't work with multi line strings
-        regex = "\".*\"";
-        mtchr = Pattern.compile(regex).matcher(this.fileContentsStr);
-        while( mtchr.find() ) {
-            String stringedString = mtchr.group();
-            String originalStringedString = new String(stringedString);
-            //Remove all previously added styles
-            for( String styleChar : allStyleChars ) {
-                stringedString = stringedString.replaceAll(styleChar, "");
+        //Strings
+        StringBuffer buffer = new StringBuffer("");
+        boolean start = true;
+        for(int i=0; i<this.fileContentsStr.length(); i++) {
+            char chr = this.fileContentsStr.charAt(i);
+            if( chr == '\"' ) {
+                if( start ) {
+                    buffer.append(stringedChar);
+                    start = false;
+                }
+                else {
+                    buffer.append(endStyleChar);
+                    start = true;
+                }
+                buffer.append(chr);
             }
-            this.fileContentsStr = this.fileContentsStr.replace(originalStringedString, stringedChar+stringedString+endStyleChar);
+            else {
+                buffer.append(chr);
+            }
         }
+        this.fileContentsStr = buffer.toString();
 
-        //Single Quoted Strings. Doesn't work with multi line strings
-        regex = "'.*'";
-        mtchr = Pattern.compile(regex).matcher(this.fileContentsStr);
-        while( mtchr.find() ) {
-            String stringedString = mtchr.group();
-            String originalStringedString = new String(stringedString);
-            //Remove all previously added styles
-            for( String styleChar : allStyleChars ) {
-                stringedString = stringedString.replaceAll(styleChar, "");
+        buffer = new StringBuffer("");
+        start = true;
+        for(int i=0; i<this.fileContentsStr.length(); i++) {
+            char chr = this.fileContentsStr.charAt(i);
+            if( chr == '\'' ) {
+                if( start ) {
+                    buffer.append(stringedChar);
+                    start = false;
+                }
+                else {
+                    buffer.append(endStyleChar);
+                    start = true;
+                }
+                buffer.append(chr);
             }
-            this.fileContentsStr = this.fileContentsStr.replace(originalStringedString, stringedChar+stringedString+endStyleChar);
+            else {
+                buffer.append(chr);
+            }
         }
+        this.fileContentsStr = buffer.toString();
 
         //Numbers
-        // regex = "\\b\\d*\\.*\\d+\\b";
-        // mtchr = Pattern.compile(regex).matcher(this.fileContentsStr);
-        // while( mtchr.find() ) {
-        //     String numberString = mtchr.group();
-        //     this.fileContentsStr = this.fileContentsStr.replaceAll(numberString, numberedChar+numberString+endStyleChar);
-        // }
+        String numbersRegex = "-?\\d+\\.?\\d*";
+        mtchr = Pattern.compile(numbersRegex).matcher(this.fileContentsStr);
+        buffer = new StringBuffer("");
+        while( mtchr.find() ) {
+            System.out.println(mtchr.start() + " - " + mtchr.end());
+            System.out.println( "|" + this.fileContentsStr.substring(mtchr.start(), mtchr.end()) + "|" );
+            // String numberString = mtchr.group();
+            // String originalCommentString = new String(numberString);
+            // this.fileContentsStr = this.fileContentsStr.replace(originalCommentString, numberedChar+numberString+endStyleChar);
+        }
     }
 
     private void drawOnBufferedImage() {

@@ -5,6 +5,8 @@
 
 package thebigint.autocoder;
 
+import java.awt.Image;
+import java.awt.Toolkit;
 import javax.swing.JFrame;
 import java.awt.Dimension;
 import java.io.File;
@@ -32,6 +34,9 @@ public class AutoCoder {
         }
 
         JFrame mainFrame = new JFrame("The Big Int Auto Coder");
+
+        Image icon = Toolkit.getDefaultToolkit().getImage("images/icon.png");
+        mainFrame.setIconImage(icon);
 
         //When window X button is clcked, it exits the application.
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
