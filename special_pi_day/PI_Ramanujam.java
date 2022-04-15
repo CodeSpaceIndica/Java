@@ -30,6 +30,11 @@ public class PI_Ramanujam {
 
     private BigDecimal seriesSum = new BigDecimal(0);
 
+    private BigInteger lastFactorial = new BigInteger("1");
+
+    private BigInteger lastN = BigInteger.ONE;
+    private BigInteger lastFactorial4N = new BigInteger("1");
+
     public PI_Ramanujam() {
         //Turns out square root of 2 itself is an irrational number
         //So instead of calculating it, we just take it from a site 
@@ -46,8 +51,8 @@ public class PI_Ramanujam {
     public void calculatePI() {
         //Variable result1 should contain result of
         // (4n)! / n!^4
-        BigDecimal firstNumerator = new BigDecimal( getFactorial( FOUR.multiply(n) ), PRECISION );
-        BigInteger nFactorial = getFactorial(n);
+        BigDecimal firstNumerator = new BigDecimal( getFactorial3( FOUR.multiply(n) ), PRECISION );
+        BigInteger nFactorial = getFactorial2(n);
         BigDecimal firstDenominator = new BigDecimal( nFactorial.pow(4), PRECISION );
         BigDecimal result1 = firstNumerator.divide(firstDenominator, PRECISION);
 
@@ -83,5 +88,40 @@ public class PI_Ramanujam {
             aNum = aNum.subtract(BigInteger.ONE);
         }
         return factorial;
+    }
+
+    /**
+     * Get a factorial of a number. Please pass a positive number
+     * This factorial function will simply multiply the parameter
+     * aNum with the last factorial that was calculated.
+     * This will only work if aNum, the parameter, is a proper series.
+     */
+    private BigInteger getFactorial2(BigInteger aNum) {
+        if(aNum.longValue() == 0 || aNum.longValue() == 1) {
+            return lastFactorial;
+        }
+        lastFactorial = lastFactorial.multiply(aNum);
+
+        return lastFactorial;
+    }
+
+
+    /**
+     * Get a factorial of a number. Please pass a positive number
+     * This factorial function will simply multiply the parameter
+     * aNum with the last factorial that was calculated.
+     * This will only work if aNum, the parameter, is a proper series.
+     */
+    private BigInteger getFactorial3(BigInteger aNum) {
+        if(aNum.longValue() == 0 || aNum.longValue() == 1) {
+            return lastFactorial4N;
+        }
+        String tmp = aNum.toString();
+        while(aNum.longValue() > lastN.longValue()) {
+            lastFactorial4N = lastFactorial4N.multiply(aNum);
+            aNum = aNum.subtract(BigInteger.ONE);
+        }
+        lastN = new BigInteger(tmp);
+        return lastFactorial4N;
     }
 }
