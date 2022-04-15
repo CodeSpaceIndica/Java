@@ -192,11 +192,11 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
                 double origA = a;
                 double origB = b;
 
-                var n = 0;
+                int n = 0;
 
                 while( n < this.maxIteration ) {
-                    var aa = a*a - b*b;
-                    var bb = 2 * a * b;
+                    double aa = a*a - b*b;
+                    double bb = 2 * a * b;
 
                     if( Math.abs(aa+bb) > this.threshold ) {
                         break;
