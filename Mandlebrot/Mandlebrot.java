@@ -91,6 +91,13 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
      */
     public void startDrawing() {
         if( !this.currentlyDrawing ) {
+            //Area of rectangle basically
+            double newArea = (this.maxXVal - this.minXVal) * (this.maxYVal - this.minYVal);
+            //8 because the initial limits of the graph are from -2 to 2.
+            double zoomed = 8.0 / newArea;
+
+            System.out.println(this.minXVal + " " + this.minYVal + ", " +  this.maxXVal + " " + this.maxYVal + "|A=" + newArea + "|Z=" + zoomed + "|maxIter=" + this.maxIteration + "|threshold=" + this.threshold);
+
             x = 0;
             this.currentlyDrawing = true;
             Thread aThread = new Thread(this);
@@ -270,13 +277,6 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
             this.maxXVal = map(x, 0, WIDTH,  oldMinXVal, oldMaxXVal);
             this.maxYVal = map(y, 0, HEIGHT, oldMinYVal, oldMaxYVal);
 
-            //Area of rectangle basically
-            double newArea = (this.maxXVal - this.minXVal) * (this.maxYVal - this.minYVal);
-            //8 because the initial limits of the graph are from -2 to 2.
-            double zoomed = 8.0 / newArea;
-
-            System.out.println(this.minXVal + " " + this.minYVal + ", " +  this.maxXVal + " " + this.maxYVal + " A=" + newArea + " Z=" + zoomed);
-
             startDrawing();
         }
     }
@@ -305,6 +305,10 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
 
     @Override
     public void keyTyped(KeyEvent ke) {
+        if( this.currentlyDrawing ) {
+            System.out.println("Busy...");
+            return;
+        }
         if( ke.getKeyChar() == '+' ) {
             this.minXVal += 0.01;
             this.minYVal += 0.01;
@@ -319,7 +323,27 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
             this.maxYVal += 0.01;
             this.startDrawing();
         }
-        else if( ke.getKeyCode() == KeyEvent.VK_ESCAPE ) {
+        else if( ke.getKeyChar() == 'a' ) {
+            this.maxIteration *= 10;
+            this.startDrawing();
+        }
+        else if( ke.getKeyChar() == 's' ) {
+            this.maxIteration /= 10;
+            this.startDrawing();
+        }
+        else if( ke.getKeyChar() == 'z' ) {
+            this.threshold *= 10;
+            this.startDrawing();
+        }
+        else if( ke.getKeyChar() == 'x' ) {
+            this.threshold /= 10;
+            this.startDrawing();
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent ke) {
+        if( ke.getKeyCode() == KeyEvent.VK_ESCAPE ) {
             this.minXVal = -2;
             this.minYVal = -2;
             this.maxXVal = 2;
@@ -327,8 +351,7 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
             this.startDrawing();
         }
     }
-    @Override
-    public void keyPressed(KeyEvent ke) {}
+
     @Override
     public void keyReleased(KeyEvent ke) {}
 
