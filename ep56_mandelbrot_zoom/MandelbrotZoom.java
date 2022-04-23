@@ -144,7 +144,7 @@ public class MandelbrotZoom {
      */
     private int getColor(int n) {
         if (n < this.maxIteration && n > 0) {
-            int i = n % 15;
+            int i = n % 16;
             return this.colorMap[i];
         }
         return this.black;
