@@ -1,6 +1,12 @@
 //To Compile : javac -d . MandelbrotZoom.java
-//To Execute : java thebigint.mandelbrotzoom.Mandelbrot
-//Java version when this was created : openjdk version "14.0.1" 2020-04-14
+//To Execute : 
+//java thebigint.mandelbrotzoom.MandelbrotZoom -1.2576470439078538 0.3780652779236957, -1.2576470439074896 0.3780652779240597
+//java thebigint.mandelbrotzoom.MandelbrotZoom -0.6002735730728121 -0.6646192892692977 -0.6002735278513613 -0.6646192440478469
+//java thebigint.mandelbrotzoom.MandelbrotZoom 0.27448947852666156 -0.006315217712621591 0.2744894785266986 -0.006315217712584573
+//java thebigint.mandelbrotzoom.MandelbrotZoom 0.36989570933793936 0.6714366753122559, 0.36989570933811894 0.6714366753124356
+//java thebigint.mandelbrotzoom.MandelbrotZoom -1.469375574129762 -0.011646337485088934, -1.4693755741062213 -0.01164633746154828
+//java thebigint.mandelbrotzoom.MandelbrotZoom -0.7730988756640723 -0.126912260064924, -0.7730988756639694 -0.12691226006482104
+//Java version when this was created : openjdk version "17.0.2"
 //Generate mp4 using this ffmpeg command
 //ffmpeg -framerate 25 -i image_frame_%03d.png new.mp4
 package thebigint.mandelbrotzoom;
@@ -13,6 +19,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import javax.imageio.ImageIO;
 
 /**
@@ -41,16 +48,10 @@ public class MandelbrotZoom {
     private double sMaxY = 2;
 
     //Ending MIN AND MAX VALUES.
-    // private double eMinX = -0.6002735730728121;
-    // private double eMinY = -0.6646192892692977;
-    // private double eMaxX = -0.6002735278513613;
-    // private double eMaxY = -0.6646192440478469;
     private double eMinX = -1.2576470439078538;
     private double eMinY = 0.3780652779236957;
     private double eMaxX = -1.2576470439074896;
     private double eMaxY = 0.3780652779240597;
-
-    //-1.2576470439078538 0.3780652779236957, -1.2576470439074896 0.3780652779240597
 
     private double minXIncr;
     private double minYIncr;
@@ -70,8 +71,13 @@ public class MandelbrotZoom {
      * 1. INitializes the color map
      * 1. Initializes the BufferedImage for drawing the Mandlebrot
      */
-    public MandelbrotZoom() {
+    public MandelbrotZoom(double eMinX, double eMinY, double eMaxX, double eMaxY) {
         this.initializeColorMap();
+
+        this.eMinX = eMinX;
+        this.eMinY = eMinY;
+        this.eMaxX = eMaxX;
+        this.eMaxY = eMaxY;
 
         this.minXIncr = (this.eMinX - this.sMinX) / NUM_FRAMES;
         this.minYIncr = (this.eMinY - this.sMinY) / NUM_FRAMES;
@@ -155,7 +161,6 @@ public class MandelbrotZoom {
      */
     public void generateFrames() {
         int f = 0;
-        //for(int f=0; f<NUM_FRAMES+1; f++) {
         while( this.sMinX < this.eMinX || this.sMinY < this.eMinY
                 || this.sMaxX > this.eMaxX || this.sMaxY > this.eMaxY ) {
             for(int x=0; x<WIDTH; x++) {
@@ -186,8 +191,27 @@ public class MandelbrotZoom {
                     this.imagePixels[px] = clr;
                 }
             }
-            //Done drawing. Save it
+
+            //Done drawing. Set pixels
             mbImage.setRGB(0, 0, WIDTH, HEIGHT, imagePixels, 0, WIDTH);
+
+            //Draw on image how much zoomed.
+            //Area of rectangle basically
+            double newArea = (this.sMaxX - this.sMinX) * (this.sMaxY - this.sMinY);
+            //8 because the initial limits of the graph are from -2 to 2. 
+            //Length is 4 each side, thus area is 16
+            long zoomed = (long)(16 / newArea);
+            String zoomText = zoomed + "x";
+            if( zoomed >= Long.MAX_VALUE ) {
+                zoomText = "More than 9 Quadrillion!";
+            }
+
+            Graphics2D g = mbImage.createGraphics();
+            g.setPaint(Color.WHITE);
+            g.drawString(zoomText, 10, 20);
+            g.dispose();
+
+            //Save it.
             String fileName = "images\\image_frame_" + String.format("%03d", (f+1)) + ".png";
             try {
                 File outputfile = new File(fileName);
@@ -220,7 +244,54 @@ public class MandelbrotZoom {
      * @param args
      */
     public static void main(String args[]) {
-        MandelbrotZoom mZoom = new MandelbrotZoom();
+        double eMiX = 0.0d;
+        double eMiY = 0.0d;
+        double eMaX = 0.0d;
+        double eMaY = 0.0d;
+
+        String val = null;
+        if( args.length >= 1 ) {
+            val = args[0];
+        }
+        eMiX = parseDouble("eMinX", val, -1.2576470439078538);
+
+        val = null;
+        if( args.length >= 2 ) {
+            val = args[1];
+        }
+        eMiY = parseDouble("eMinY", val, 0.3780652779236957);
+
+        val = null;
+        if( args.length >= 3 ) {
+            val = args[2];   
+        }
+        eMaX = parseDouble("eMaxX", val, -1.2576470439074896);
+
+        val = null;
+        if( args.length >= 4 ) {
+            val = args[3];
+        }
+        eMaY = parseDouble("eMaxY", val, 0.3780652779240597);
+
+        MandelbrotZoom mZoom = new MandelbrotZoom(eMiX, eMiY, eMaX, eMaY);
         mZoom.generateFrames();
+    }
+
+    private static double parseDouble(String argName, String arg, double defaultValue) {
+        double returnVal = defaultValue;
+        if( arg == null ) {
+            returnVal = defaultValue;
+            System.out.println("No value for " + argName + ", default value :" + defaultValue);
+        }
+        else {
+            try {
+                returnVal = Double.parseDouble(arg);
+            }
+            catch(Exception exp) {
+                System.out.println("Incorrect value for " + argName + ", default value :" + defaultValue);
+                returnVal = defaultValue;
+            }
+        }
+        return returnVal;
     }
 }
