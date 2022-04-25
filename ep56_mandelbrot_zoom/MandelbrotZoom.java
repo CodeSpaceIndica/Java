@@ -212,7 +212,7 @@ public class MandelbrotZoom {
             g.dispose();
 
             //Save it.
-            String fileName = "images\\image_frame_" + String.format("%03d", (f+1)) + ".png";
+            String fileName = "images/image_frame_" + String.format("%03d", (f+1)) + ".png";
             try {
                 File outputfile = new File(fileName);
                 ImageIO.write(mbImage, "png", outputfile);
