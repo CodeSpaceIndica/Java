@@ -15,8 +15,16 @@ import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.AWTException;
 import java.awt.BasicStroke;
 import javax.swing.JFrame;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.datatransfer.Clipboard;
+import java.awt.Toolkit;
+import java.awt.Image;
+import java.io.IOException;
 
 /**
  * Mandlebrot Set Canvas class as well as its main function.
@@ -63,6 +71,8 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
     //Basic stroke of width 2.
     private BasicStroke stroke = new BasicStroke(2);
 
+    private long zoomed;
+
     /**
      * Constructor. 
      * 1. Add mouse events.
@@ -94,9 +104,9 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
             //Area of rectangle basically
             double newArea = (this.maxXVal - this.minXVal) * (this.maxYVal - this.minYVal);
             //8 because the initial limits of the graph are from -2 to 2.
-            double zoomed = 8.0 / newArea;
+            this.zoomed = (long)(16.0 / newArea);
 
-            System.out.println(this.minXVal + " " + this.minYVal + ", " +  this.maxXVal + " " + this.maxYVal + "|A=" + newArea + "|Z=" + zoomed + "|maxIter=" + this.maxIteration + "|threshold=" + this.threshold);
+            System.out.println(this.minXVal + " " + this.minYVal + ", " +  this.maxXVal + " " + this.maxYVal + "|A=" + newArea + "|Z=" + this.zoomed + "|maxIter=" + this.maxIteration + "|threshold=" + this.threshold);
 
             x = 0;
             this.currentlyDrawing = true;
@@ -124,6 +134,10 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
         graphics.setStroke(stroke);
         graphics.drawRect(this.mouseRect.x, this.mouseRect.y, this.mouseRect.width, this.mouseRect.height);
 
+        graphics.setPaint(Color.black);
+        graphics.fillRect(0, 0, 160, 20);
+        graphics.setPaint(Color.WHITE);
+        graphics.drawString(this.zoomed + "x", 3, 15);
     }
 
     /**
@@ -185,6 +199,21 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
             return this.colorMap[i];
         }
         return this.black;
+    }
+
+    private void copyToClipboard() {
+        if( this.currentlyDrawing ) {
+            return;
+        }
+        try {
+            TransferableImage trans = new TransferableImage( mbImage );
+            Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+            c.setContents( trans, null );
+        }
+        catch ( Exception x ) {
+            //x.printStackTrace();
+        }
+        System.out.println("Done copying image to clipboard");
     }
 
     /**
@@ -339,6 +368,9 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
             this.threshold /= 10;
             this.startDrawing();
         }
+        else if( ke.getKeyChar() == 'c' ) {
+            this.copyToClipboard();
+        }
     }
 
     @Override
@@ -387,5 +419,41 @@ public class Mandlebrot extends Canvas implements MouseListener, MouseMotionList
 
         mandlebrotCanvas.startDrawing();
     }
-  
+
+    /** 
+     * Taken from https://stackoverflow.com/questions/4552045/copy-bufferedimage-to-clipboard
+     */
+    private class TransferableImage implements Transferable {
+        Image i;
+
+        public TransferableImage( Image i ) {
+            this.i = i;
+        }
+
+        public Object getTransferData( DataFlavor flavor ) throws UnsupportedFlavorException, IOException {
+            if ( flavor.equals( DataFlavor.imageFlavor ) && i != null ) {
+                return i;
+            }
+            else {
+                throw new UnsupportedFlavorException( flavor );
+            }
+        }
+
+        public DataFlavor[] getTransferDataFlavors() {
+            DataFlavor[] flavors = new DataFlavor[ 1 ];
+            flavors[ 0 ] = DataFlavor.imageFlavor;
+            return flavors;
+        }
+
+        public boolean isDataFlavorSupported( DataFlavor flavor ) {
+            DataFlavor[] flavors = getTransferDataFlavors();
+            for ( int i = 0; i < flavors.length; i++ ) {
+                if ( flavor.equals( flavors[ i ] ) ) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 }
